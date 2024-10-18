@@ -1,29 +1,30 @@
-name: Firebase Deploy
+name: Deploy to Firebase
 
 on:
   push:
     branches:
-      - main  # main branch-এ পুশ করার সময় ডিপ্লয় হবে
+      - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Install Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'  
-
-      - name: Install dependencies
+      - uses: actions/checkout@v3
+      - name: Install Dependencies
         run: npm install
-
-      - name: Build project
-        run: npm run build  
+      - name: Build Application
+        run: npm run build
+      - name: Configure Firebase
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - name: Login to Firebase
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.FIREBASE_CREDENTIALS }}
       - name: Deploy to Firebase
-        run: firebase deploy --only hosting
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          args: deploy
+          token: ${{ secrets.FIREBASE_TOKEN }}
+          project: ${{ secrets.FIREBASE_TOKEN }}
